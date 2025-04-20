@@ -72,7 +72,7 @@ require_once '../includes/header.php';
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Editar
       </a>
-      <a href="nueva-consulta.php?paciente_id=<?php echo $paciente['id_paciente']; ?>" class="button">
+      <a href="nueva_consulta.php?paciente_id=<?php echo $paciente['id_paciente']; ?>" class="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
         Nueva Consulta
       </a>
@@ -127,7 +127,7 @@ require_once '../includes/header.php';
     <div class="card-header">
       <div class="flex items-center justify-between">
         <div class="card-title">Consultas Médicas</div>
-        <a href="nueva-consulta.php?paciente_id=<?php echo $paciente['id_paciente']; ?>" class="button">
+        <a href="nueva_consulta.php?paciente_id=<?php echo $paciente['id_paciente']; ?>" class="button">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           Nueva Consulta
         </a>

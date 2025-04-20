@@ -20,7 +20,7 @@ unset($_SESSION['errores']);
   <div class="alert alert-danger"><?php echo $errores['general']; ?></div>
   <?php endif; ?>
   
-  <form method="POST" action="../logic/registrar-paciente.php">
+  <form method="POST" action="../logic/registrar_paciente.php">
     <div class="card">
       <div class="card-header">
         <div class="card-title">Información Personal</div>

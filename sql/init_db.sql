@@ -53,7 +53,7 @@ CREATE TABLE HistoriaClinica (
     cx TEXT,
     examen_fisico TEXT,
     dx TEXT,
-    plan TEXT,
+    planMedico TEXT,
     FOREIGN KEY (id_consulta) REFERENCES Consulta(id_consulta) ON DELETE CASCADE
 );
 

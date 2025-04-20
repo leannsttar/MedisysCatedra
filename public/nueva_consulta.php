@@ -35,7 +35,7 @@ require_once '../includes/header.php';
   <div class="alert alert-danger"><?php echo $errores['general']; ?></div>
   <?php endif; ?>
   
-  <form method="POST" action="../logic/crear-consulta.php">
+  <form method="POST" action="../logic/crear_consulta.php">
     <input type="hidden" name="id_paciente" value="<?php echo $paciente['id_paciente']; ?>">
     
     <div class="card mb-4">
@@ -160,7 +160,7 @@ require_once '../includes/header.php';
         </div>
         
         <div class="form-actions">
-          <a href="paciente-detalle.php?id=<?php echo $paciente['id_paciente']; ?>" class="button button-secondary">Cancelar</a>
+          <a href="paciente_detalle.php?id=<?php echo $paciente['id_paciente']; ?>" class="button button-secondary">Cancelar</a>
           <button type="submit" class="button">Guardar Consulta</button>
         </div>
       </div>

@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if ($stmt) {
             $idPaciente = sqlsrv_get_field($stmt, 0);
-            header("Location: ../public/paciente-detalle.php?id=$idPaciente");
+            header("Location: ../public/paciente_detalle.php?id=$idPaciente");
             exit();
         } else {
             $errores['general'] = "Error al registrar el paciente: " . print_r(sqlsrv_errors(), true);
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Si hay errores, los guardamos en sesión para mostrarlos en el formulario
     $_SESSION['errores'] = $errores;
     $_SESSION['datos_paciente'] = $_POST;
-    header("Location: ../public/nuevo-paciente.php");
+    header("Location: ../public/nuevo_paciente.php");
     exit();
 }
 ?>

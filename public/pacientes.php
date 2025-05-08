@@ -8,7 +8,10 @@ require_once '../includes/header.php';
 
 // Búsqueda de pacientes
 $busqueda = isset($_GET['busqueda']) ? trim($_GET['busqueda']) : '';
-$sql = "SELECT * FROM Paciente WHERE nombre LIKE ? ORDER BY nombre";
+$sql = "SELECT ID_Paciente, Nombre, Apellido, Telefono, Fecha_Nacimiento 
+        FROM Paciente 
+        WHERE CONCAT(Nombre, ' ', Apellido) LIKE ? 
+        ORDER BY Nombre, Apellido";
 $params = array("%$busqueda%");
 $stmt = ejecutarConsulta($sql, $params);
 $pacientes = obtenerFilas($stmt);
@@ -46,21 +49,27 @@ $pacientes = obtenerFilas($stmt);
           </thead>
           <tbody>
             <?php foreach ($pacientes as $paciente): 
-              // Obtener última consulta
-              $sqlConsulta = "SELECT TOP 1 fecha FROM Consulta WHERE id_paciente = ? ORDER BY fecha DESC";
-              $stmtConsulta = ejecutarConsulta($sqlConsulta, array($paciente['id_paciente']));
-              $ultimaConsulta = obtenerFila($stmtConsulta);
-              $fechaConsulta = $ultimaConsulta ? $ultimaConsulta['fecha']->format('d/m/Y') : 'Nunca';
+              // Calcular la edad
+              $fechaNacimiento = $paciente['Fecha_Nacimiento'];
+              $edad = $fechaNacimiento ? date_diff($fechaNacimiento, date_create('today'))->y : 'N/A';
 
+              // Obtener última consulta
+              $sqlConsulta = "SELECT TOP 1 Fecha_Visita 
+                              FROM Visita_Medica 
+                              WHERE ID_Paciente = ? 
+                              ORDER BY Fecha_Visita DESC";
+              $stmtConsulta = ejecutarConsulta($sqlConsulta, array($paciente['ID_Paciente']));
+              $ultimaConsulta = obtenerFila($stmtConsulta);
+              $fechaConsulta = $ultimaConsulta ? $ultimaConsulta['Fecha_Visita']->format('d/m/Y') : 'Nunca';
             ?>
             <tr>
-              <td>P-<?php echo str_pad($paciente['id_paciente'], 3, '0', STR_PAD_LEFT); ?></td>
-              <td><?php echo htmlspecialchars($paciente['nombre']); ?></td>
-              <td><?php echo $paciente['edad']; ?> años</td>
-              <td><?php echo htmlspecialchars($paciente['telefono']); ?></td>
+              <td>P-<?php echo str_pad($paciente['ID_Paciente'], 3, '0', STR_PAD_LEFT); ?></td>
+              <td><?php echo htmlspecialchars($paciente['Nombre'] . ' ' . $paciente['Apellido']); ?></td>
+              <td><?php echo $edad; ?> años</td>
+              <td><?php echo htmlspecialchars($paciente['Telefono']); ?></td>
               <td><?php echo $fechaConsulta; ?></td>
               <td>
-                <a href="paciente_detalle.php?id=<?php echo $paciente['id_paciente']; ?>" class="button button-secondary">Ver Detalles</a>
+                <a href="paciente_detalle.php?id=<?php echo $paciente['ID_Paciente']; ?>" class="button button-secondary">Ver Detalles</a>
               </td>
             </tr>
             <?php endforeach; ?>

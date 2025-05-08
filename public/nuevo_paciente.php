@@ -20,7 +20,7 @@ unset($_SESSION['errores']);
   <div class="alert alert-danger"><?php echo $errores['general']; ?></div>
   <?php endif; ?>
   
-  <form method="POST" action="../logic/registrar_paciente.php">
+  <form method="POST" action="../logic/registrar_paciente.php" class="form">
     <div class="card">
       <div class="card-header">
         <div class="card-title">Información Personal</div>
@@ -29,11 +29,20 @@ unset($_SESSION['errores']);
       <div class="card-content">
         <div class="grid grid-cols-1 grid-md-cols-2 gap-4">
           <div class="form-group">
-            <label class="form-label">Nombre Completo *</label>
+            <label class="form-label">Nombre *</label>
             <input type="text" name="nombre" class="form-input <?php echo isset($errores['nombre']) ? 'invalid' : ''; ?>" 
-                   placeholder="Nombre y apellidos" required value="<?php echo htmlspecialchars($datosPaciente['nombre'] ?? ''); ?>">
+                   placeholder="Nombre" required value="<?php echo htmlspecialchars($datosPaciente['nombre'] ?? ''); ?>">
             <?php if (isset($errores['nombre'])): ?>
             <div class="form-error"><?php echo $errores['nombre']; ?></div>
+            <?php endif; ?>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Apellido *</label>
+            <input type="text" name="apellido" class="form-input <?php echo isset($errores['apellido']) ? 'invalid' : ''; ?>" 
+                   placeholder="Apellido" required value="<?php echo htmlspecialchars($datosPaciente['apellido'] ?? ''); ?>">
+            <?php if (isset($errores['apellido'])): ?>
+            <div class="form-error"><?php echo $errores['apellido']; ?></div>
             <?php endif; ?>
           </div>
           
@@ -48,53 +57,62 @@ unset($_SESSION['errores']);
           
           <div class="form-group">
             <label class="form-label">Género *</label>
-            <select name="sexo" class="form-select" required>
+            <select name="sexo" class="form-select <?php echo isset($errores['sexo']) ? 'invalid' : ''; ?>" required>
               <option value="">Seleccionar género...</option>
-              <option value="M" <?php echo ($datosPaciente['sexo'] ?? '') == 'M' ? 'selected' : ''; ?>>Masculino</option>
-              <option value="F" <?php echo ($datosPaciente['sexo'] ?? '') == 'F' ? 'selected' : ''; ?>>Femenino</option>
-              <option value="O" <?php echo ($datosPaciente['sexo'] ?? '') == 'O' ? 'selected' : ''; ?>>Otro</option>
+              <option value="Masculino" <?php echo ($datosPaciente['sexo'] ?? '') == 'Masculino' ? 'selected' : ''; ?>>Masculino</option>
+              <option value="Femenino" <?php echo ($datosPaciente['sexo'] ?? '') == 'Femenino' ? 'selected' : ''; ?>>Femenino</option>
             </select>
+            <?php if (isset($errores['sexo'])): ?>
+            <div class="form-error"><?php echo $errores['sexo']; ?></div>
+            <?php endif; ?>
           </div>
           
           <div class="form-group">
-            <label class="form-label">Número de Teléfono *</label>
+            <label class="form-label">Número de Teléfono</label>
             <input type="tel" name="telefono" class="form-input <?php echo isset($errores['telefono']) ? 'invalid' : ''; ?>" 
-                   placeholder="Ej: 555-123-4567" required value="<?php echo htmlspecialchars($datosPaciente['telefono'] ?? ''); ?>">
+                   placeholder="Ej: 555-123-4567" value="<?php echo htmlspecialchars($datosPaciente['telefono'] ?? ''); ?>">
             <?php if (isset($errores['telefono'])): ?>
             <div class="form-error"><?php echo $errores['telefono']; ?></div>
             <?php endif; ?>
           </div>
           
           <div class="form-group">
-            <label class="form-label">Correo Electrónico</label>
-            <input type="email" name="correo" class="form-input" 
-                   placeholder="correo@ejemplo.com" value="<?php echo htmlspecialchars($datosPaciente['correo'] ?? ''); ?>">
-          </div>
-          
-          <div class="form-group">
             <label class="form-label">Dirección</label>
-            <input type="text" name="direccion" class="form-input" 
+            <input type="text" name="direccion" class="form-input <?php echo isset($errores['direccion']) ? 'invalid' : ''; ?>" 
                    placeholder="Calle, número, colonia" value="<?php echo htmlspecialchars($datosPaciente['direccion'] ?? ''); ?>">
+            <?php if (isset($errores['direccion'])): ?>
+            <div class="form-error"><?php echo $errores['direccion']; ?></div>
+            <?php endif; ?>
           </div>
         </div>
         
         <div class="grid grid-cols-1 grid-md-cols-2 gap-4 mt-4">
           <div class="form-group">
             <label class="form-label">Contacto de Emergencia</label>
-            <input type="text" name="contacto_emergencia" class="form-input" 
+            <input type="text" name="contacto_emergencia" class="form-input <?php echo isset($errores['contacto_emergencia']) ? 'invalid' : ''; ?>" 
                    placeholder="Nombre y relación" value="<?php echo htmlspecialchars($datosPaciente['contacto_emergencia'] ?? ''); ?>">
+            <?php if (isset($errores['contacto_emergencia'])): ?>
+            <div class="form-error"><?php echo $errores['contacto_emergencia']; ?></div>
+            <?php endif; ?>
           </div>
           
           <div class="form-group">
             <label class="form-label">Teléfono de Emergencia</label>
-            <input type="tel" name="telefono_emergencia" class="form-input" 
+            <input type="tel" name="telefono_emergencia" class="form-input <?php echo isset($errores['telefono_emergencia']) ? 'invalid' : ''; ?>" 
                    placeholder="Ej: 555-123-4567" value="<?php echo htmlspecialchars($datosPaciente['telefono_emergencia'] ?? ''); ?>">
+            <?php if (isset($errores['telefono_emergencia'])): ?>
+            <div class="form-error"><?php echo $errores['telefono_emergencia']; ?></div>
+            <?php endif; ?>
           </div>
         </div>
         
         <div class="form-group mt-4">
           <label class="form-label">Notas Adicionales</label>
-          <textarea name="notas" class="form-textarea" placeholder="Alergias, condiciones preexistentes, etc."><?php echo htmlspecialchars($datosPaciente['notas'] ?? ''); ?></textarea>
+          <textarea name="notas" class="form-textarea <?php echo isset($errores['notas']) ? 'invalid' : ''; ?>" 
+                    placeholder="Alergias, condiciones preexistentes, etc."><?php echo htmlspecialchars($datosPaciente['notas'] ?? ''); ?></textarea>
+          <?php if (isset($errores['notas'])): ?>
+          <div class="form-error"><?php echo $errores['notas']; ?></div>
+          <?php endif; ?>
         </div>
         
         <div class="form-actions">

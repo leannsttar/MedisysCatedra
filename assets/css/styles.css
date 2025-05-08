@@ -632,7 +632,7 @@
   }
   
   /* Modal */
-  .modal-overlay {
+  /* .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -701,7 +701,7 @@
     justify-content: flex-end;
     gap: 12px;
   }
-  
+   */
   /* Login Page */
   .login-container {
     width: 100%;
@@ -869,3 +869,121 @@
     grid-template-columns: repeat(4, 1fr);
     }
     }
+
+/* Formulario */
+form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+}
+
+/* Etiquetas */
+form label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--foreground);
+}
+
+/* Campos de entrada */
+form input[type="text"],
+form input[type="number"],
+form input[type="datetime-local"],
+form input[type="date"],
+form input[type="time"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    color: var(--foreground);
+    background-color: var(--muted);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+    border-color: var(--primary);
+    background-color: var(--background);
+}
+
+/* Botones */
+form button {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+form button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Mensajes de error */
+form .form-error {
+    color: var(--danger);
+    font-size: 0.75rem;
+    margin-top: -8px;
+    margin-bottom: 16px;
+}
+
+/* Contenedor del formulario */
+.form-container {
+    margin-top: 24px;
+    padding: 24px;
+    background-color: var(--background);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+}
+
+/* Títulos */
+.form-container h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--foreground);
+}
+
+.form-container .form-group {
+    margin-bottom: 20px;
+}
+
+.form-container .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Contenedor de cuadrícula para el formulario */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+/* Asegurar que los campos de texto ocupen toda la columna */
+.grid-container .form-group textarea {
+    grid-column: span 2;
+}
+
+/* Botones de acción */
+.form-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+

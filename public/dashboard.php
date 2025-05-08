@@ -29,25 +29,25 @@ require_once '../includes/header.php';
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
       </div>
       <?php
-      $sql = "SELECT COUNT(*) as total FROM Consulta WHERE fecha = CONVERT(date, GETDATE())";
+      $sql = "SELECT COUNT(*) as total FROM Cita WHERE CONVERT(date, Fecha_Hora) = CONVERT(date, GETDATE())";
       $stmt = ejecutarConsulta($sql);
       $row = obtenerFila($stmt);
       ?>
       <div class="stats-value"><?php echo $row['total']; ?></div>
-      <div class="stats-label">Consultas Hoy</div>
+      <div class="stats-label">Citas Hoy</div>
     </div>
     
     <div class="stats-card">
       <div class="stats-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
       <?php
-      $sql = "SELECT COUNT(*) as total FROM HistoriaClinica";
+      $sql = "SELECT COUNT(*) as total FROM Visita_Medica";
       $stmt = ejecutarConsulta($sql);
       $row = obtenerFila($stmt);
       ?>
       <div class="stats-value"><?php echo $row['total']; ?></div>
-      <div class="stats-label">Historias Clínicas</div>
+      <div class="stats-label">Visitas Médicas</div>
     </div>
   </div>
   
@@ -69,26 +69,27 @@ require_once '../includes/header.php';
           </thead>
           <tbody>
             <?php
-            $sql = "SELECT TOP 5 c.id_consulta, p.nombre, c.fecha, c.hora, c.medico_responsable, h.dx, p.id_paciente 
-                    FROM Consulta c
-                    JOIN Paciente p ON c.id_paciente = p.id_paciente
-                    LEFT JOIN HistoriaClinica h ON c.id_consulta = h.id_consulta
-                    ORDER BY c.fecha DESC, c.hora DESC";
+            $sql = "SELECT TOP 5 v.ID_Visita, p.Nombre + ' ' + p.Apellido AS Paciente, v.Fecha_Visita, 
+                           per.Nombre + ' ' + per.Apellido AS Medico, v.Diagnostico, p.ID_Paciente
+                    FROM Visita_Medica v
+                    JOIN Paciente p ON v.ID_Paciente = p.ID_Paciente
+                    JOIN Medico m ON v.ID_Medico = m.ID_Medico
+                    JOIN Personal per ON m.ID_Medico = per.ID_Personal
+                    ORDER BY v.Fecha_Visita DESC";
             $stmt = ejecutarConsulta($sql);
             $consultas = obtenerFilas($stmt);
             
             foreach ($consultas as $consulta):
-              $fecha = $consulta['fecha']->format('d/m/Y');
-              $hora = $consulta['hora']->format('H:i');
-              $dx = $consulta['dx'] ? substr($consulta['dx'], 0, 30) . (strlen($consulta['dx']) > 30 ? '...' : '') : 'No registrado';
+              $fecha = $consulta['Fecha_Visita']->format('d/m/Y');
+              $dx = $consulta['Diagnostico'] ? substr($consulta['Diagnostico'], 0, 30) . (strlen($consulta['Diagnostico']) > 30 ? '...' : '') : 'No registrado';
             ?>
             <tr>
-              <td><?php echo htmlspecialchars($consulta['nombre']); ?></td>
+              <td><?php echo htmlspecialchars($consulta['Paciente']); ?></td>
               <td><?php echo $fecha; ?></td>
-              <td><?php echo htmlspecialchars($consulta['medico_responsable']); ?></td>
+              <td><?php echo htmlspecialchars($consulta['Medico']); ?></td>
               <td><?php echo htmlspecialchars($dx); ?></td>
               <td>
-                <a href="paciente_detalle.php?id=<?php echo $consulta['id_paciente']; ?>" class="button button-secondary">Ver Detalles</a>
+                <a href="paciente_detalle.php?id=<?php echo $consulta['ID_Paciente']; ?>" class="button button-secondary">Ver Detalles</a>
               </td>
             </tr>
             <?php endforeach; ?>

@@ -1,4 +1,3 @@
-
 <?php
 $serverName = "DESKTOP-JMRVJV9";
 $connectionOptions = array(
@@ -17,11 +16,11 @@ if (!$conn) {
 function ejecutarConsulta($sql, $params = array()) {
     global $conn;
     $stmt = sqlsrv_query($conn, $sql, $params);
-    
+
     if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true));
+        die('Error en la consulta SQL: ' . print_r(sqlsrv_errors(), true));
     }
-    
+
     return $stmt;
 }
 

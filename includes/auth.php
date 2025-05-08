@@ -16,16 +16,22 @@ function requerirLogin() {
 
 // Verificar credenciales
 function verificarCredenciales($usuario, $password) {
-    $sql = "SELECT id_usuario, nombre_usuario, contrasena FROM Usuario WHERE nombre_usuario = ?";
+    $sql = "SELECT ID_Usuario, Username, PasswordHash FROM Usuario WHERE Username = ?";
     $stmt = ejecutarConsulta($sql, array($usuario));
     $row = obtenerFila($stmt);
-    
-    if ($row && password_verify($password, $row['contrasena'])) {
-        $_SESSION['usuario_id'] = $row['id_usuario'];
-        $_SESSION['nombre_usuario'] = $row['nombre_usuario'];
+
+    if (!$row) {
+        die('Usuario no encontrado en la base de datos.');
+    }
+
+    echo 'Usuario encontrado: ' . print_r($row, true);
+
+    if (password_verify($password, $row['PasswordHash'])) {
+        $_SESSION['usuario_id'] = $row['ID_Usuario'];
+        $_SESSION['nombre_usuario'] = $row['Username'];
         return true;
     }
-    
-    return false;
+
+    die('Contraseña incorrecta.');
 }
 ?>

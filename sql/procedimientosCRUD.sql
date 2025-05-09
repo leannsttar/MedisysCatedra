@@ -54,6 +54,78 @@ END;
 GO
 PRINT 'Procedimiento InsertarPaciente creado.';
 
+-- CRUD: UPDATE (Actualizar Información de Paciente)
+PRINT 'Creando procedimiento ActualizarPaciente...';
+GO
+CREATE PROCEDURE ActualizarPaciente (
+    @ID_Paciente INT,
+    @Nombre NVARCHAR(100),
+    @Apellido NVARCHAR(100),
+    @Direccion NVARCHAR(200) = NULL,
+    @Fecha_Nacimiento DATE = NULL,
+    @Sexo NVARCHAR(10) = NULL,
+    @Telefono NVARCHAR(20) = NULL,
+    @Contacto_Emergencia NVARCHAR(100) = NULL,
+    @Telefono_Contacto_Emergencia NVARCHAR(20) = NULL
+)
+AS
+BEGIN
+    -- Documentación interna: Actualiza un registro existente en la tabla Paciente. Realiza validaciones básicas.
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM Paciente WHERE ID_Paciente = @ID_Paciente)
+    BEGIN
+        PRINT 'Error: El paciente con ID ' + CAST(@ID_Paciente AS NVARCHAR) + ' no existe.';
+        RAISERROR('El paciente especificado no existe.', 16, 1);
+        RETURN -1; -- Error: Paciente no existe
+    END
+
+    IF LTRIM(RTRIM(ISNULL(@Nombre, ''))) = '' OR LTRIM(RTRIM(ISNULL(@Apellido, ''))) = '' BEGIN
+        PRINT 'Error: El nombre y el apellido del paciente son obligatorios.';
+        RAISERROR('El nombre y el apellido del paciente son obligatorios.', 16, 1);
+        RETURN -2; -- Error: Campos obligatorios vacíos
+    END
+
+    IF @Sexo IS NOT NULL AND @Sexo NOT IN ('Masculino', 'Femenino') BEGIN
+        PRINT 'Error: El valor para Sexo no es válido. Use "Masculino" o "Femenino".';
+        RAISERROR('El valor para Sexo no es válido. Use "Masculino" o "Femenino".', 16, 1);
+        RETURN -3; -- Error: Valor de sexo inválido
+    END
+
+    BEGIN TRY
+        UPDATE Paciente SET
+            Nombre = @Nombre,
+            Apellido = @Apellido,
+            Direccion = @Direccion,
+            Fecha_Nacimiento = @Fecha_Nacimiento,
+            Sexo = @Sexo,
+            Telefono = @Telefono,
+            Contacto_Emergencia = @Contacto_Emergencia,
+            Telefono_Contacto_Emergencia = @Telefono_Contacto_Emergencia
+        WHERE ID_Paciente = @ID_Paciente;
+
+        IF @@ROWCOUNT = 0
+        BEGIN
+            -- Esto no debería pasar si la validación de existencia previa fue exitosa,
+            -- pero es una salvaguarda.
+            PRINT 'Advertencia: No se actualizó ninguna fila para el paciente ID ' + CAST(@ID_Paciente AS NVARCHAR) + '. Verifique los datos o la concurrencia.';
+            RETURN 0; -- Técnicamente no es un error de SP, pero no se hizo nada.
+        END
+
+        PRINT 'Paciente ID ' + CAST(@ID_Paciente AS NVARCHAR) + ' actualizado correctamente.';
+        RETURN 0; -- Éxito
+    END TRY
+    BEGIN CATCH
+        PRINT 'Error SQL al actualizar paciente: ' + ERROR_MESSAGE();
+        RAISERROR('Error al actualizar paciente.', 16, 1);
+        RETURN -99; -- Error SQL genérico
+    END CATCH
+END;
+GO
+PRINT 'Procedimiento ActualizarPaciente creado.';
+PRINT 'Procedimientos Almacenados CRUD actualizados.';
+GO
+
 -- CRUD: READ (Obtener Visitas de un Paciente)
 PRINT 'Creando procedimiento ObtenerVisitasPaciente...';
 GO

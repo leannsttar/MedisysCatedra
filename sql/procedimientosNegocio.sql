@@ -25,27 +25,28 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Validar que el paciente exista
     IF NOT EXISTS (SELECT 1 FROM Paciente WHERE ID_Paciente = @ID_Paciente) BEGIN
         SET @OUT_Mensaje = 'Error: El paciente con ID ' + CAST(@ID_Paciente AS NVARCHAR) + ' no existe.';
         SET @OUT_ID_Cita = NULL;
-        RAISERROR(@OUT_Mensaje, 16, 1);
         RETURN -1;
     END
 
+    -- Validar que el médico exista
     IF NOT EXISTS (SELECT 1 FROM Medico WHERE ID_Medico = @ID_Medico_Seleccionado) BEGIN
         SET @OUT_Mensaje = 'Error: El médico con ID ' + CAST(@ID_Medico_Seleccionado AS NVARCHAR) + ' no existe.';
         SET @OUT_ID_Cita = NULL;
-        RAISERROR(@OUT_Mensaje, 16, 1);
         RETURN -2;
     END
 
+    -- Validar que la fecha y hora sean futuras
     IF @Fecha_Hora_Cita <= GETDATE() BEGIN
         SET @OUT_Mensaje = 'Error: La fecha y hora de la cita (' + CONVERT(NVARCHAR, @Fecha_Hora_Cita, 120) + ') debe ser en el futuro.';
         SET @OUT_ID_Cita = NULL;
-        RAISERROR(@OUT_Mensaje, 16, 1);
         RETURN -3;
     END
 
+    -- Validar que el médico no tenga otra cita en la misma fecha y hora
     IF EXISTS (SELECT 1 FROM Cita
                WHERE ID_Medico = @ID_Medico_Seleccionado
                  AND Fecha_Hora = @Fecha_Hora_Cita
@@ -53,23 +54,21 @@ BEGIN
     BEGIN
        SET @OUT_Mensaje = 'Error: El médico seleccionado ya tiene una cita programada para ' + CONVERT(NVARCHAR, @Fecha_Hora_Cita, 120) + '.';
        SET @OUT_ID_Cita = NULL;
-       RAISERROR(@OUT_Mensaje, 16, 1);
        RETURN -4;
     END
 
     BEGIN TRY
+        -- Insertar la cita
         INSERT INTO Cita (Fecha_Hora, ID_Paciente, ID_Medico, Estado_Cita)
         VALUES (@Fecha_Hora_Cita, @ID_Paciente, @ID_Medico_Seleccionado, 'Programada');
 
         SET @OUT_ID_Cita = SCOPE_IDENTITY();
         SET @OUT_Mensaje = 'Cita programada exitosamente para el paciente ID ' + CAST(@ID_Paciente AS NVARCHAR) + ' con el Médico ID: ' + CAST(@ID_Medico_Seleccionado AS NVARCHAR) + '. ID Cita: ' + CAST(@OUT_ID_Cita AS NVARCHAR);
-        PRINT @OUT_Mensaje;
         RETURN 0; -- Éxito
     END TRY
     BEGIN CATCH
         SET @OUT_Mensaje = 'Error SQL al insertar la cita: ' + ERROR_MESSAGE();
         SET @OUT_ID_Cita = NULL;
-        RAISERROR(@OUT_Mensaje, 16, 1);
         RETURN -99;
     END CATCH
 END;
@@ -139,7 +138,8 @@ BEGIN
         RETURN -4;
     END
     
-    IF LTRIM(RTRIM(ISNULL(@Motivo_Consulta, ''))) = '' OR LTRIM(RTRIM(ISNULL(@Diagnostico, ''))) = '' BEGIN
+    IF LTRIM(RTRIM(ISNULL(@Motivo_Consulta, ''))) = '' OR LTRIM(RTRIM(ISNULL(@Diagnostico, ''))) = ''
+    BEGIN
         SET @OUT_Mensaje = 'Error: El motivo de consulta y el diagnóstico son obligatorios para registrar la visita.';
         SET @OUT_ID_Visita = NULL;
         RAISERROR(@OUT_Mensaje, 16, 1);
@@ -168,19 +168,19 @@ BEGIN
         SET Estado_Cita = 'Realizada'
         WHERE ID_Cita = @ID_Cita;
 
-        IF @@ROWCOUNT = 0 -- Doble chequeo por si algo extraño pasó
+        IF @@ROWCOUNT = 0
         BEGIN
-            SET @OUT_Mensaje = 'Error: No se pudo actualizar el estado de la cita ID ' + CAST(@ID_Cita AS NVARCHAR) + ' a "Realizada", pero la visita fue registrada. Revise manualmente.';
-            RAISERROR(@OUT_Mensaje, 16, 1);
-            ROLLBACK TRANSACTION; -- Importante: si la cita no se actualiza, es mejor deshacer la inserción de la visita.
+            SET @OUT_Mensaje = 'Error: No se pudo actualizar el estado de la cita ID ' + CAST(@ID_Cita AS NVARCHAR) + ' a "Realizada".';
             SET @OUT_ID_Visita = NULL;
+            ROLLBACK TRANSACTION;
+            RAISERROR(@OUT_Mensaje, 16, 1);
             RETURN -98;
         END
 
         COMMIT TRANSACTION;
-        SET @OUT_Mensaje = 'Visita médica ID ' + CAST(@OUT_ID_Visita AS NVARCHAR) + ' registrada exitosamente. Cita ID ' + CAST(@ID_Cita AS NVARCHAR) + ' actualizada a "Realizada".';
-        PRINT @OUT_Mensaje;
-        RETURN 0; -- Éxito
+
+        SET @OUT_Mensaje = 'Visita médica registrada exitosamente.';
+        RETURN 0;
 
     END TRY
     BEGIN CATCH
@@ -194,6 +194,7 @@ BEGIN
     END CATCH
 END;
 GO
+
 PRINT 'Procedimiento RegistrarVisitaCompleta creado.';
 PRINT 'Procedimientos Almacenados con Lógica de Negocio actualizados.';
 GO

@@ -7,12 +7,12 @@ $tituloPagina = "Nueva Cita";
 require_once '../includes/header.php';
 
 // Obtener lista de pacientes
-$sqlPacientes = "SELECT ID_Paciente, Nombre + ' ' + Apellido AS NombreCompleto FROM Paciente ORDER BY Nombre, Apellido";
+$sqlPacientes = "SELECT ID_Paciente, CONCAT(Nombre, ' ', Apellido) AS NombreCompleto FROM Paciente ORDER BY Nombre, Apellido";
 $stmtPacientes = ejecutarConsulta($sqlPacientes);
 $pacientes = obtenerFilas($stmtPacientes);
 
 // Obtener lista de médicos
-$sqlMedicos = "SELECT m.ID_Medico, per.Nombre + ' ' + per.Apellido AS NombreCompleto 
+$sqlMedicos = "SELECT m.ID_Medico, CONCAT(per.Nombre, ' ', per.Apellido) AS NombreCompleto 
                FROM Medico m
                JOIN Personal per ON m.ID_Medico = per.ID_Personal
                ORDER BY per.Nombre, per.Apellido";
@@ -22,6 +22,10 @@ $medicos = obtenerFilas($stmtMedicos);
 
 <div class="form-container">
   <h1>Programar Nueva Cita</h1>
+  <?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger"><?php echo htmlspecialchars($_SESSION['error']); ?></div>
+    <?php unset($_SESSION['error']); ?>
+  <?php endif; ?>
   <form action="../logic/registrar_cita.php" method="POST">
     <div class="form-group">
       <label for="id_paciente">Paciente</label>

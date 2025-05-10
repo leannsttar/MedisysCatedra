@@ -7,26 +7,30 @@ $tituloPagina = "Nueva Visita Médica";
 require_once '../includes/header.php';
 
 // Obtener lista de pacientes
-$sqlPacientes = "SELECT ID_Paciente, Nombre + ' ' + Apellido AS NombreCompleto FROM Paciente ORDER BY Nombre, Apellido";
+$sqlPacientes = "SELECT ID_Paciente, CONCAT(Nombre, ' ', Apellido) AS NombreCompleto FROM Paciente ORDER BY Nombre, Apellido";
 $stmtPacientes = ejecutarConsulta($sqlPacientes);
 $pacientes = obtenerFilas($stmtPacientes);
 
 // Obtener lista de médicos
-$sqlMedicos = "SELECT m.ID_Medico, per.Nombre + ' ' + per.Apellido AS NombreCompleto 
+$sqlMedicos = "SELECT m.ID_Medico, CONCAT(p.Nombre, ' ', p.Apellido) AS NombreCompleto
                FROM Medico m
-               JOIN Personal per ON m.ID_Medico = per.ID_Personal
-               ORDER BY per.Nombre, per.Apellido";
+               INNER JOIN Personal p ON m.ID_Medico = p.ID_Personal
+               ORDER BY p.Nombre, p.Apellido";
 $stmtMedicos = ejecutarConsulta($sqlMedicos);
 $medicos = obtenerFilas($stmtMedicos);
 
-// Obtener lista de citas (opcional)
-$sqlCitas = "SELECT c.ID_Cita, p.Nombre + ' ' + p.Apellido AS Paciente, c.Fecha_Hora 
-             FROM Cita c
-             JOIN Paciente p ON c.ID_Paciente = p.ID_Paciente
-             WHERE c.Estado_Cita = 'Programada'
-             ORDER BY c.Fecha_Hora";
-$stmtCitas = ejecutarConsulta($sqlCitas);
-$citas = obtenerFilas($stmtCitas);
+// Obtener citas programadas del paciente seleccionado (si hay un paciente seleccionado)
+$idPacienteSeleccionado = $_GET['id_paciente'] ?? null;
+$citas = [];
+if ($idPacienteSeleccionado) {
+    $sqlCitas = "SELECT c.ID_Cita, c.Fecha_Hora, CONCAT(m.Nombre, ' ', m.Apellido) AS Medico
+                 FROM Cita c
+                 INNER JOIN Personal m ON c.ID_Medico = m.ID_Personal
+                 WHERE c.ID_Paciente = ? AND c.Estado_Cita = 'Programada'
+                 ORDER BY c.Fecha_Hora";
+    $stmtCitas = ejecutarConsulta($sqlCitas, [$idPacienteSeleccionado]);
+    $citas = obtenerFilas($stmtCitas);
+}
 ?>
 
 <div class="container">
@@ -35,30 +39,42 @@ $citas = obtenerFilas($stmtCitas);
     <div class="grid-container">
       <div class="form-group">
         <label for="id_paciente">Paciente</label>
-        <select name="id_paciente" id="id_paciente" required>
+        <select name="id_paciente" id="id_paciente" required onchange="filtrarCitasPorPaciente(this.value)">
           <option value="">Seleccione un paciente</option>
           <?php foreach ($pacientes as $paciente): ?>
-            <option value="<?php echo $paciente['ID_Paciente']; ?>"><?php echo htmlspecialchars($paciente['NombreCompleto']); ?></option>
+            <option value="<?php echo $paciente['ID_Paciente']; ?>" <?php echo $idPacienteSeleccionado == $paciente['ID_Paciente'] ? 'selected' : ''; ?>>
+              <?php echo htmlspecialchars($paciente['NombreCompleto']); ?>
+            </option>
           <?php endforeach; ?>
         </select>
       </div>
+
+      <?php if ($idPacienteSeleccionado): ?>
+        <div class="form-group">
+          <label for="id_cita">Cita Programada</label>
+          <select name="id_cita" id="id_cita">
+            <option value="">Seleccione una cita (opcional)</option>
+            <?php foreach ($citas as $cita): ?>
+              <option value="<?php echo $cita['ID_Cita']; ?>">
+                <?php 
+                  if ($cita['Fecha_Hora'] instanceof DateTime) {
+                      echo htmlspecialchars($cita['Fecha_Hora']->format('d/m/Y H:i') . ' - ' . $cita['Medico']);
+                  } else {
+                      echo htmlspecialchars(date('d/m/Y H:i', strtotime($cita['Fecha_Hora'])) . ' - ' . $cita['Medico']);
+                  }
+                ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      <?php endif; ?>
+
       <div class="form-group">
         <label for="id_medico">Médico</label>
         <select name="id_medico" id="id_medico" required>
           <option value="">Seleccione un médico</option>
           <?php foreach ($medicos as $medico): ?>
             <option value="<?php echo $medico['ID_Medico']; ?>"><?php echo htmlspecialchars($medico['NombreCompleto']); ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="id_cita">Cita (opcional)</label>
-        <select name="id_cita" id="id_cita">
-          <option value="">Seleccione una cita (opcional)</option>
-          <?php foreach ($citas as $cita): ?>
-            <option value="<?php echo $cita['ID_Cita']; ?>">
-              <?php echo htmlspecialchars($cita['Paciente'] . ' - ' . $cita['Fecha_Hora']->format('d/m/Y H:i')); ?>
-            </option>
           <?php endforeach; ?>
         </select>
       </div>
@@ -112,5 +128,15 @@ $citas = obtenerFilas($stmtCitas);
     </div>
   </form>
 </div>
+
+<script>
+  function filtrarCitasPorPaciente(idPaciente) {
+    if (idPaciente) {
+      window.location.href = `nueva_visita.php?id_paciente=${idPaciente}`;
+    } else {
+      window.location.href = `nueva_visita.php`;
+    }
+  }
+</script>
 
 <?php require_once '../includes/footer.php'; ?>

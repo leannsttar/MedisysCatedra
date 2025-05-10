@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medisys - <?php echo $tituloPagina ?? 'Sistema Médico'; ?></title>
-  <link rel="stylesheet" href="/medisys/assets/css/styles.css">
+    
 </head>
 <body>
   <div class="app-container">

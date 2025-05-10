@@ -5,7 +5,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idPaciente = $_POST['id_paciente'];
     $idMedico = $_POST['id_medico'];
     $fechaHora = $_POST['fecha_hora'];
-    $estado = $_POST['estado'];
 
     // Validar y formatear la fecha y hora
     $fechaHoraFormateada = date('Y-m-d H:i:s', strtotime($fechaHora));
@@ -17,15 +16,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $sql = "INSERT INTO Cita (ID_Paciente, ID_Medico, Fecha_Hora, Estado_Cita)
-                VALUES (?, ?, ?, ?)";
-        $params = array($idPaciente, $idMedico, $fechaHoraFormateada, $estado);
-        ejecutarConsulta($sql, $params);
+        // Llamar al procedimiento almacenado
+        $sql = "{CALL ProgramarCitaManual(?, ?, ?, ?, ?)}";
+        $idCita = null;
+        $mensaje = null;
 
-        // Redirigir a la lista de citas con un mensaje de éxito
-        $_SESSION['mensaje'] = "Cita registrada exitosamente.";
-        header('Location: ../public/citas.php');
-        exit();
+        $params = [
+            $idPaciente,
+            $idMedico,
+            $fechaHoraFormateada,
+            &$idCita, // Parámetro de salida para el ID de la cita
+            &$mensaje // Parámetro de salida para el mensaje
+        ];
+
+        $stmt = ejecutarConsulta($sql, $params);
+
+        if ($stmt && $idCita) {
+            // Si la cita se registró correctamente, redirigir a la lista de citas
+            $_SESSION['mensaje'] = $mensaje; // Mensaje de éxito
+            header('Location: ../public/citas.php');
+            exit();
+        } else {
+            // Si hubo un error, redirigir al formulario con el mensaje de error
+            $_SESSION['error'] = $mensaje ?: "Error al registrar la cita.";
+            header('Location: ../public/nueva_cita.php');
+            exit();
+        }
     } catch (Exception $e) {
         // Manejar errores de la consulta SQL
         $_SESSION['error'] = "Error al registrar la cita: " . $e->getMessage();

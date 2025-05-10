@@ -19,23 +19,18 @@ if (!$paciente) {
     exit;
 }
 
+// Obtener visitas médicas del paciente usando el procedimiento almacenado
+$sqlVisitas = "{CALL ObtenerVisitasPaciente(?)}";
+$visitas = obtenerFilas(ejecutarConsulta($sqlVisitas, [$idPaciente]));
+
 // Obtener citas del paciente
-$sqlCitas = "SELECT c.ID_Cita, c.Fecha_Hora, c.Estado_Cita, CONCAT(per.Nombre, ' ', per.Apellido) AS Medico
+$sqlCitas = "SELECT Fecha_Hora, Estado_Cita, CONCAT(p.Nombre, ' ', p.Apellido) AS Medico
              FROM Cita c
              INNER JOIN Medico m ON c.ID_Medico = m.ID_Medico
-             INNER JOIN Personal per ON m.ID_Medico = per.ID_Personal
+             INNER JOIN Personal p ON m.ID_Medico = p.ID_Personal
              WHERE c.ID_Paciente = ?
              ORDER BY c.Fecha_Hora DESC";
 $citas = obtenerFilas(ejecutarConsulta($sqlCitas, [$idPaciente]));
-
-// Obtener visitas médicas del paciente
-$sqlVisitas = "SELECT v.ID_Visita, v.Fecha_Visita, CONCAT(per.Nombre, ' ', per.Apellido) AS Medico, v.Diagnostico
-               FROM Visita_Medica v
-               INNER JOIN Medico m ON v.ID_Medico = m.ID_Medico
-               INNER JOIN Personal per ON m.ID_Medico = per.ID_Personal
-               WHERE v.ID_Paciente = ?
-               ORDER BY v.Fecha_Visita DESC";
-$visitas = obtenerFilas(ejecutarConsulta($sqlVisitas, [$idPaciente]));
 
 $tituloPagina = "Detalle del Paciente: " . htmlspecialchars($paciente['Nombre']);
 require_once '../includes/header.php';
@@ -43,6 +38,7 @@ require_once '../includes/header.php';
 
 <div class="container">
   <h1><?php echo htmlspecialchars($paciente['Nombre'] . ' ' . $paciente['Apellido']); ?></h1>
+  <a href="editar_paciente.php?id=<?php echo $idPaciente; ?>" class="button">Editar Paciente</a>
   <p><strong>Fecha de Nacimiento:</strong> 
     <?php echo htmlspecialchars($paciente['Fecha_Nacimiento'] instanceof DateTime ? $paciente['Fecha_Nacimiento']->format('d/m/Y') : $paciente['Fecha_Nacimiento']); ?>
   </p>
@@ -52,12 +48,14 @@ require_once '../includes/header.php';
   <p><strong>Contacto de Emergencia:</strong> <?php echo htmlspecialchars($paciente['Contacto_Emergencia']); ?></p>
   <p><strong>Teléfono de Emergencia:</strong> <?php echo htmlspecialchars($paciente['Telefono_Contacto_Emergencia']); ?></p>
 
+
+
   <h2>Citas</h2>
   <?php if (count($citas) > 0): ?>
     <table class="table">
       <thead>
         <tr>
-          <th>Fecha y Hora</th>
+          <th>Fecha</th>
           <th>Médico</th>
           <th>Estado</th>
         </tr>
@@ -78,7 +76,7 @@ require_once '../includes/header.php';
     <p>No hay citas registradas para este paciente.</p>
   <?php endif; ?>
 
-  <h2>Visitas Médicas</h2>
+    <h2>Visitas Médicas</h2>
   <?php if (count($visitas) > 0): ?>
     <table class="table">
       <thead>
@@ -86,6 +84,7 @@ require_once '../includes/header.php';
           <th>Fecha</th>
           <th>Médico</th>
           <th>Diagnóstico</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -96,6 +95,9 @@ require_once '../includes/header.php';
             </td>
             <td><?php echo htmlspecialchars($visita['Medico']); ?></td>
             <td><?php echo htmlspecialchars($visita['Diagnostico']); ?></td>
+            <td>
+              <a href="visita_detalle.php?id=<?php echo $visita['ID_Visita']; ?>" class="button button-secondary">Ver Detalles</a>
+            </td>
           </tr>
         <?php endforeach; ?>
       </tbody>

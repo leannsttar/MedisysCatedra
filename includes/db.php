@@ -7,6 +7,7 @@ $connectionOptions = array(
 );
 
 // Establecer conexión
+global $conn;
 $conn = sqlsrv_connect($serverName, $connectionOptions);
 
 if (!$conn) {
@@ -44,4 +45,13 @@ function obtenerFilas($stmt) {
         $rows[] = convertirUtf8($row);
     }
     return $rows;
+}
+
+function obtenerUltimoIdInsertado() {
+    global $conn; // tu conexión global SQLSRV
+    $stmt = sqlsrv_query($conn, "SELECT SCOPE_IDENTITY() AS id");
+    if ($stmt && $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        return $row['id'];
+    }
+    return null;
 }

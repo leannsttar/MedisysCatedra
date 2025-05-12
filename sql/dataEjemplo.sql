@@ -13,9 +13,7 @@ PRINT 'Insertando datos en Rol...';
 INSERT INTO Rol (Nombre_Rol) VALUES
 ('Administrador'),
 ('Médico'),
-('Enfermero/a'),
-('Recepcionista'),
-('Técnico de Laboratorio');
+('Recepcionista'),;
 GO
 PRINT 'Datos de Rol insertados.';
 

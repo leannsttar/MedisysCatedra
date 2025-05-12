@@ -5,6 +5,18 @@ requerirLogin();
 
 $tituloPagina = "Panel de Control";
 require_once '../includes/header.php';
+
+// echo "Rol actual en sesión: ";
+// var_dump($_SESSION['rol']);
+
+// echo "Permiso para gestionar_pacientes: ";
+// var_dump(usuarioTienePermiso('gestionar_pacientes'));
+
+// echo "Permiso para gestionar_citas: ";
+// var_dump(usuarioTienePermiso('gestionar_citas'));
+
+// echo "Permiso para gestionar_visitas: ";
+// var_dump(usuarioTienePermiso('gestionar_visitas'));
 ?>
 
 <div class="container">

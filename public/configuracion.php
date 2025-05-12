@@ -150,59 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </div>
   
-  <div class="card mt-4">
-    <div class="card-header">
-      <div class="card-title">Configuración del Sistema</div>
-    </div>
-    <div class="card-content">
-      <form>
-        <div class="grid grid-cols-1 grid-md-cols-2 gap-4">
-          <div class="form-group">
-            <label class="form-label">Nombre de la Clínica</label>
-            <input type="text" class="form-input" value="Clínica Medisys">
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Dirección</label>
-            <input type="text" class="form-input" placeholder="Ingrese la dirección">
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Teléfono</label>
-            <input type="text" class="form-input" placeholder="Ingrese el teléfono">
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Correo Electrónico</label>
-            <input type="email" class="form-input" placeholder="Ingrese el correo">
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Zona Horaria</label>
-            <select class="form-select">
-              <option value="America/Mexico_City">Ciudad de México (GMT-6)</option>
-              <option value="America/Bogota">Bogotá (GMT-5)</option>
-              <option value="America/Santiago">Santiago (GMT-4)</option>
-              <option value="America/Buenos_Aires">Buenos Aires (GMT-3)</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">Formato de Fecha</label>
-            <select class="form-select">
-              <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-              <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-              <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="submit" class="button">Guardar Cambios</button>
-        </div>
-      </form>
-    </div>
-  </div>
+  
 </div>
 
 <?php require_once '../includes/footer.php'; ?>

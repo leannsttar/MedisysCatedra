@@ -1,0 +1,32 @@
+https://docs.google.com/document/d/1ajKfHxzElbvEEqX5uoTDez3Mrwsq8sGmcUetIy2N-gw/edit?usp=sharing
+
+
+
+🩺 Escenario de la Problemática - Sistema Medisys (a partir del diseño de la base de datos)
+La Clínica Parroquial María Auxiliadora Alta Vista actualmente enfrenta dificultades significativas en la gestión de información médica debido al uso exclusivo de expedientes físicos en papel. Esta situación ha provocado problemas críticos como:
+Dificultad en la localización y recuperación de expedientes médicos antiguos por acumulación de archivos.
+
+
+Falta de trazabilidad estructurada sobre las consultas médicas realizadas y los signos vitales registrados.
+
+
+Ausencia de medidas de seguridad adecuadas, con riesgo de pérdida, daño o acceso no autorizado a la información sensible.
+
+
+Inexistencia de historial médico digitalizado, lo que impide a los médicos tener una visión completa y en tiempo real del estado clínico de cada paciente.
+
+
+--- El diseño actual de la base de datos Medisys responde directamente a estas carencias, proponiendo:
+Un modelo relacional que centraliza la información de pacientes, personal médico y consultas médicas.
+
+
+Una estructura clara para almacenar signos vitales, diagnósticos y planes de tratamiento por cada visita, a través de la tabla Visita_Medica.
+
+
+Un sistema de usuarios vinculado a los registros de personal (Usuario) que permite control de acceso y seguridad.
+
+
+Un registro de auditoría (BITACORA) que permite monitorear las operaciones realizadas en el sistema, garantizando rastreabilidad y transparencia.
+
+
+Soporte para manejar citas programadas y visitas médicas independientes, lo que ofrece flexibilidad en la atención, incluyendo emergencias sin cita previa.

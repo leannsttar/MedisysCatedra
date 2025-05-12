@@ -10,21 +10,21 @@ Propósito: Registra una visita médica completa asociada a una cita, paciente y
 DOCUMENTACIÓN
 =======================================================================
 Propósito:
-Permite registrar una visita médica para un paciente y un médico, asociada a una cita existente, almacenando signos vitales, motivo, diagnóstico y plan de tratamiento. Valida la existencia de la cita, paciente y médico, el estado de la cita y la obligatoriedad de los campos principales.
+Permite registrar una visita médica para un paciente y un médico, asociada a una cita existente, almacenando signos vitales, motivo, diagnóstico y plan de tratamiento. Valida la existencia de la cita, paciente y médico, el estado de la cita, la obligatoriedad de los campos principales y las restricciones de formato y rango para los datos clínicos.
 
 Parámetros:
 @ID_Cita           - (Requerido) Identificador único de la cita (entero positivo)
 @ID_Paciente       - (Requerido) Identificador único del paciente (entero positivo)
 @ID_Medico         - (Requerido) Identificador único del médico (entero positivo)
-@Talla             - Talla del paciente en cm (decimal, opcional)
-@Peso              - Peso del paciente en kg (decimal, opcional)
-@Tension_Arterial  - Tensión arterial (texto, opcional)
-@Pulso             - Pulso cardíaco (entero, opcional)
-@Spo2              - Saturación de oxígeno (entero, opcional)
-@Temperatura       - Temperatura corporal (decimal, opcional)
-@Motivo_Consulta   - (Requerido) Motivo de la consulta (texto)
+@Talla             - Talla del paciente en cm (decimal, opcional, 30.00 a 250.00)
+@Peso              - Peso del paciente en kg (decimal, opcional, 1.00 a 350.00)
+@Tension_Arterial  - Tensión arterial (texto, opcional, máx 20 caracteres)
+@Pulso             - Pulso cardíaco (entero, opcional, 20 a 250)
+@Spo2              - Saturación de oxígeno (entero, opcional, 50 a 100)
+@Temperatura       - Temperatura corporal (decimal, opcional, 30.00 a 45.00)
+@Motivo_Consulta   - (Requerido) Motivo de la consulta (texto, no vacío)
 @Examen_Fisico     - Examen físico realizado (texto, opcional)
-@Diagnostico       - (Requerido) Diagnóstico médico (texto)
+@Diagnostico       - (Requerido) Diagnóstico médico (texto, no vacío)
 @Plan_Tratamiento  - Plan de tratamiento (texto, opcional)
 @OUT_ID_Visita     - (Salida) ID de la visita médica creada (entero)
 @OUT_Mensaje       - (Salida) Mensaje descriptivo del resultado (texto)
@@ -36,26 +36,37 @@ Códigos de Retorno:
 -3   - Médico no existe
 -4   - Estado de cita no válido para registrar visita
 -5   - Motivo de consulta o diagnóstico vacío
+-6   - Valor fuera de rango o formato inválido en datos clínicos
 -98  - No se pudo actualizar el estado de la cita
 -99  - Error de sistema
 
 Ejemplo de uso:
 DECLARE @ID_Visita INT, @Mensaje NVARCHAR(255);
+
+-- Caso exitoso (todos los parámetros válidos, cita programada para Elena Morales con el Dr. Carlos Rivera)
 EXEC RegistrarVisitaCompleta
-    @ID_Cita = 8,
-    @ID_Paciente = 3,
-    @ID_Medico = 5,
-    @Motivo_Consulta = N'Control de presión arterial',
-    @Diagnostico = N'Hipertensión controlada',
+    @ID_Cita = 1, -- Cita programada para Elena Morales (ID_Paciente=1) y Carlos Rivera (ID_Medico=1)
+    @ID_Paciente = 1,
+    @ID_Medico = 1,
+    @Talla = 160.0,
+    @Peso = 65.5,
+    @Tension_Arterial = N'120/80',
+    @Pulso = 75,
+    @Spo2 = 98,
+    @Temperatura = 36.8,
+    @Motivo_Consulta = N'Chequeo general anual.',
+    @Examen_Fisico = N'Paciente afebril, consciente, orientada.',
+    @Diagnostico = N'Paciente sana, control de rutina.',
+    @Plan_Tratamiento = N'Continuar estilo de vida saludable.',
     @OUT_ID_Visita = @ID_Visita OUTPUT,
     @OUT_Mensaje = @Mensaje OUTPUT;
 PRINT @Mensaje;
 
--- Caso: Cita no existe
+-- Caso: Cita no existe (ID_Cita no registrado)
 EXEC RegistrarVisitaCompleta
     @ID_Cita = 9999,
     @ID_Paciente = 1,
-    @ID_Medico = 2,
+    @ID_Medico = 1,
     @Motivo_Consulta = N'Consulta',
     @Diagnostico = N'Diagnóstico',
     @OUT_ID_Visita = @ID_Visita OUTPUT,
@@ -63,18 +74,36 @@ EXEC RegistrarVisitaCompleta
 
 -- Caso: Paciente no existe
 EXEC RegistrarVisitaCompleta
-    @ID_Cita = 10,
+    @ID_Cita = 1,
     @ID_Paciente = 9999,
+    @ID_Medico = 1,
+    @Motivo_Consulta = N'Consulta',
+    @Diagnostico = N'Diagnóstico',
+    @OUT_ID_Visita = @ID_Visita OUTPUT,
+    @OUT_Mensaje = @Mensaje OUTPUT;
+
+-- Caso: Médico no existe
+EXEC RegistrarVisitaCompleta
+    @ID_Cita = 1,
+    @ID_Paciente = 1,
+    @ID_Medico = 9999,
+    @Motivo_Consulta = N'Consulta',
+    @Diagnostico = N'Diagnóstico',
+    @OUT_ID_Visita = @ID_Visita OUTPUT,
+    @OUT_Mensaje = @Mensaje OUTPUT;
+
+-- Caso: Estado de cita inválido (cita ya realizada o cancelada, ejemplo: ID_Cita=4 o 5)
+EXEC RegistrarVisitaCompleta
+    @ID_Cita = 4, -- Cita ya realizada
+    @ID_Paciente = 1,
     @ID_Medico = 2,
     @Motivo_Consulta = N'Consulta',
     @Diagnostico = N'Diagnóstico',
     @OUT_ID_Visita = @ID_Visita OUTPUT,
     @OUT_Mensaje = @Mensaje OUTPUT;
 
--- Caso: Estado de cita inválido
--- (Cambie el estado de la cita a un valor distinto de 'Programada' o 'Confirmada' antes de ejecutar)
 EXEC RegistrarVisitaCompleta
-    @ID_Cita = 10,
+    @ID_Cita = 5, -- Cita cancelada
     @ID_Paciente = 2,
     @ID_Medico = 1,
     @Motivo_Consulta = N'Consulta',
@@ -92,10 +121,27 @@ EXEC RegistrarVisitaCompleta
     @OUT_ID_Visita = @ID_Visita OUTPUT,
     @OUT_Mensaje = @Mensaje OUTPUT;
 
+-- Caso: Valor fuera de rango (ejemplo: talla muy baja)
+EXEC RegistrarVisitaCompleta
+    @ID_Cita = 3,
+    @ID_Paciente = 3,
+    @ID_Medico = 5,
+    @Talla = 10.0, -- fuera de rango
+    @Peso = 14.0,
+    @Tension_Arterial = N'90/60',
+    @Pulso = 110,
+    @Spo2 = 99,
+    @Temperatura = 37.5,
+    @Motivo_Consulta = N'Control de niño sano',
+    @Diagnostico = N'Niña sana',
+    @OUT_ID_Visita = @ID_Visita OUTPUT,
+    @OUT_Mensaje = @Mensaje OUTPUT;
+
 Notas:
 - La cita debe existir y estar asociada al paciente y médico indicados.
 - Solo se permite registrar la visita si la cita está en estado 'Programada' o 'Confirmada'.
-- Motivo de consulta y diagnóstico son obligatorios.
+- Motivo de consulta y diagnóstico son obligatorios y no pueden estar vacíos.
+- Los valores clínicos opcionales, si se envían, deben cumplir con los rangos y formatos definidos.
 - El mensaje de salida (@OUT_Mensaje) describe el resultado o el error.
 ======================================================================= */
 
@@ -123,7 +169,7 @@ BEGIN
     SET NOCOUNT ON;
     DECLARE @FechaActual DATETIME = GETDATE();
 
-    -- Validaciones básicas
+    -- Validaciones de existencia
     IF NOT EXISTS (SELECT 1 FROM Cita WHERE ID_Cita = @ID_Cita AND ID_Paciente = @ID_Paciente AND ID_Medico = @ID_Medico)
     BEGIN
         SET @OUT_Mensaje = 'Error: La cita ID ' + CAST(@ID_Cita AS NVARCHAR) + ' no existe para el paciente y médico especificados.';
@@ -148,6 +194,7 @@ BEGIN
         RETURN -3;
     END
 
+    -- Validar estado de la cita
     DECLARE @EstadoCitaActual NVARCHAR(50);
     SELECT @EstadoCitaActual = Estado_Cita FROM Cita WHERE ID_Cita = @ID_Cita;
 
@@ -158,13 +205,58 @@ BEGIN
         RAISERROR(@OUT_Mensaje, 16, 1);
         RETURN -4;
     END
-    
+
+    -- Validar campos obligatorios
     IF LTRIM(RTRIM(ISNULL(@Motivo_Consulta, ''))) = '' OR LTRIM(RTRIM(ISNULL(@Diagnostico, ''))) = ''
     BEGIN
         SET @OUT_Mensaje = 'Error: El motivo de consulta y el diagnóstico son obligatorios para registrar la visita.';
         SET @OUT_ID_Visita = NULL;
         RAISERROR(@OUT_Mensaje, 16, 1);
         RETURN -5;
+    END
+
+    -- Validar rangos y formatos de datos clínicos opcionales
+    IF @Talla IS NOT NULL AND (@Talla < 30 OR @Talla > 250)
+    BEGIN
+        SET @OUT_Mensaje = 'Error: El valor de talla debe estar entre 30 y 250 cm.';
+        SET @OUT_ID_Visita = NULL;
+        RAISERROR(@OUT_Mensaje, 16, 1);
+        RETURN -6;
+    END
+    IF @Peso IS NOT NULL AND (@Peso < 1 OR @Peso > 350)
+    BEGIN
+        SET @OUT_Mensaje = 'Error: El valor de peso debe estar entre 1 y 350 kg.';
+        SET @OUT_ID_Visita = NULL;
+        RAISERROR(@OUT_Mensaje, 16, 1);
+        RETURN -6;
+    END
+    IF @Tension_Arterial IS NOT NULL AND LEN(@Tension_Arterial) > 20
+    BEGIN
+        SET @OUT_Mensaje = 'Error: La tensión arterial no debe exceder 20 caracteres.';
+        SET @OUT_ID_Visita = NULL;
+        RAISERROR(@OUT_Mensaje, 16, 1);
+        RETURN -6;
+    END
+    IF @Pulso IS NOT NULL AND (@Pulso < 20 OR @Pulso > 250)
+    BEGIN
+        SET @OUT_Mensaje = 'Error: El pulso debe estar entre 20 y 250.';
+        SET @OUT_ID_Visita = NULL;
+        RAISERROR(@OUT_Mensaje, 16, 1);
+        RETURN -6;
+    END
+    IF @Spo2 IS NOT NULL AND (@Spo2 < 50 OR @Spo2 > 100)
+    BEGIN
+        SET @OUT_Mensaje = 'Error: El valor de SpO2 debe estar entre 50 y 100.';
+        SET @OUT_ID_Visita = NULL;
+        RAISERROR(@OUT_Mensaje, 16, 1);
+        RETURN -6;
+    END
+    IF @Temperatura IS NOT NULL AND (@Temperatura < 30 OR @Temperatura > 45)
+    BEGIN
+        SET @OUT_Mensaje = 'Error: La temperatura debe estar entre 30.00 y 45.00 °C.';
+        SET @OUT_ID_Visita = NULL;
+        RAISERROR(@OUT_Mensaje, 16, 1);
+        RETURN -6;
     END
 
     BEGIN TRANSACTION;

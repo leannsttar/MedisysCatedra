@@ -14,7 +14,7 @@ function requerirLogin() {
     }
 }
 
-// Verificar credenciales
+// Verificar credenciales (contraseña en texto plano)
 function verificarCredenciales($usuario, $password) {
     $sql = "SELECT u.ID_Usuario, u.Username, u.PasswordHash, r.Nombre_Rol
             FROM Usuario u
@@ -28,11 +28,11 @@ function verificarCredenciales($usuario, $password) {
         die('Usuario no encontrado en la base de datos.');
     }
 
-    if (password_verify($password, $row['PasswordHash'])) {
+    // Comparación directa de contraseña en texto plano
+    if ($password === $row['PasswordHash']) {
         $_SESSION['usuario_id'] = $row['ID_Usuario'];
         $_SESSION['nombre_usuario'] = $row['Username'];
         $_SESSION['rol'] = $row['Nombre_Rol'];
- // <--- Guarda el rol en la sesión
         return true;
     }
 

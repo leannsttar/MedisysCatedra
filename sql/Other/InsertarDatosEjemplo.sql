@@ -3,8 +3,8 @@
 -- ==========================================================================
 
 -- Usar la base de datos
-USE medisys;
-GO
+-- USE medisys;
+-- GO
 
 -- ===================================
 -- 1. Insertar Roles
@@ -60,10 +60,11 @@ PRINT 'Datos de Medico insertados.';
 -- ===================================
 PRINT 'Insertando datos en Usuario...';
 INSERT INTO Usuario (ID_Personal, Username, PasswordHash, Activo) VALUES
-(1, 'crivera', '$2y$10$dNwwDUV4mZSnsOZ8BkSw/OqfFTXCvr/TdV9MhFTKmkHw58buuw07O', 1),
-(2, 'agomez', '$2y$10$keORDgC9BCMfLMosDHHdCOcUejFbTCT3T9jLW9kUTGcA5JgCSup8e', 1),
-(3, 'lfernandez', '$2y$10$q73SayfPPnvSl88QPX4IfeuHlFiPDNdixmvmor4tOqr8ulcjsZVCu', 1),
-(4, 'slopez', '$2y$10$maA5ZKLZE4/iTtqaHHSfe.2uwZPAVQNbQNrsewcoV8Y3GNu.Sxw3G', 1);
+(1, 'crivera', 'password', 1), -- Nueva contraseña: 'CarlosNew1!'
+(2, 'agomez', 'password', 1), -- Nueva contraseña: ''
+(3, 'lfernandez', 'password', 1), -- Nueva contraseña: ''
+(4, 'slopez', 'password', 1);  -- Nueva contraseña: ''
+
 GO
 PRINT 'Datos de Usuario insertados.';
 
